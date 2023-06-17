@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use std::fmt::Display;
+use std::{fmt::Display, sync::Arc};
 
 use crate::SyntaxShape;
 
@@ -12,7 +12,7 @@ pub enum Type {
     Bool,
     CellPath,
     Closure,
-    Custom(String),
+    Custom(Arc<str>),
     Date,
     Duration,
     Error,
