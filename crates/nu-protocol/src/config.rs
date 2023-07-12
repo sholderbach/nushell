@@ -1445,10 +1445,10 @@ fn create_keybindings(value: &Value) -> Result<Vec<ParsedKeybinding>, ShellError
     match value {
         Value::Record { cols, vals, span } => {
             // Finding the modifier value in the record
-            let modifier = extract_value("modifier", cols, vals, span)?.clone();
-            let keycode = extract_value("keycode", cols, vals, span)?.clone();
-            let mode = extract_value("mode", cols, vals, span)?.clone();
-            let event = extract_value("event", cols, vals, span)?.clone();
+            let modifier = extract_value("modifier", cols, vals, *span)?.clone();
+            let keycode = extract_value("keycode", cols, vals, *span)?.clone();
+            let mode = extract_value("mode", cols, vals, *span)?.clone();
+            let event = extract_value("event", cols, vals, *span)?.clone();
 
             let keybinding = ParsedKeybinding {
                 modifier,
@@ -1482,15 +1482,15 @@ pub fn create_menus(value: &Value) -> Result<Vec<ParsedMenu>, ShellError> {
     match value {
         Value::Record { cols, vals, span } => {
             // Finding the modifier value in the record
-            let name = extract_value("name", cols, vals, span)?.clone();
-            let marker = extract_value("marker", cols, vals, span)?.clone();
+            let name = extract_value("name", cols, vals, *span)?.clone();
+            let marker = extract_value("marker", cols, vals, *span)?.clone();
             let only_buffer_difference =
-                extract_value("only_buffer_difference", cols, vals, span)?.clone();
-            let style = extract_value("style", cols, vals, span)?.clone();
-            let menu_type = extract_value("type", cols, vals, span)?.clone();
+                extract_value("only_buffer_difference", cols, vals, *span)?.clone();
+            let style = extract_value("style", cols, vals, *span)?.clone();
+            let menu_type = extract_value("type", cols, vals, *span)?.clone();
 
             // Source is an optional value
-            let source = match extract_value("source", cols, vals, span) {
+            let source = match extract_value("source", cols, vals, *span) {
                 Ok(source) => source.clone(),
                 Err(_) => Value::Nothing { span: *span },
             };
@@ -1524,10 +1524,10 @@ pub fn extract_value<'record>(
     name: &str,
     cols: &'record [String],
     vals: &'record [Value],
-    span: &Span,
+    span: Span,
 ) -> Result<&'record Value, ShellError> {
     cols.iter()
         .position(|col| col.as_str() == name)
         .and_then(|index| vals.get(index))
-        .ok_or_else(|| ShellError::MissingConfigValue(name.to_string(), *span))
+        .ok_or_else(|| ShellError::MissingConfigValue(name.to_string(), span))
 }
