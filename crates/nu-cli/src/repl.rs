@@ -33,7 +33,7 @@ use std::{
     panic::{catch_unwind, AssertUnwindSafe},
     path::Path,
     path::PathBuf,
-    sync::{atomic::Ordering, Arc},
+    sync::Arc,
     time::{Duration, Instant},
 };
 use sysinfo::System;
@@ -265,10 +265,7 @@ fn loop_iteration(ctx: LoopContext) -> (bool, Stack, Reedline) {
     );
 
     start_time = std::time::Instant::now();
-    //Reset the ctrl-c handler
-    if let Some(ctrlc) = &mut engine_state.ctrlc {
-        ctrlc.store(false, Ordering::SeqCst);
-    }
+    engine_state.restore_cancel_flag();
     perf(
         "reset ctrlc",
         start_time,

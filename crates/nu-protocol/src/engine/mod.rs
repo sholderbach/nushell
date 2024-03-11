@@ -1,4 +1,5 @@
 mod call_info;
+mod cancel;
 mod capture_block;
 mod command;
 mod engine_state;
@@ -11,6 +12,7 @@ mod usage;
 mod variable;
 
 pub use call_info::*;
+pub use cancel::*;
 pub use capture_block::*;
 pub use command::*;
 pub use engine_state::*;

@@ -33,11 +33,7 @@ use nu_std::load_standard_library;
 use nu_utils::utils::perf;
 use run::{run_commands, run_file, run_repl};
 use signals::ctrlc_protection;
-use std::{
-    io::BufReader,
-    str::FromStr,
-    sync::{atomic::AtomicBool, Arc},
-};
+use std::{io::BufReader, str::FromStr, sync::Arc};
 
 fn get_engine_state() -> EngineState {
     let engine_state = nu_cmd_lang::create_default_context();
@@ -75,9 +71,7 @@ fn main() -> Result<()> {
         report_error_new(&engine_state, &err);
     }
 
-    let ctrlc = Arc::new(AtomicBool::new(false));
-    // TODO: make this conditional in the future
-    ctrlc_protection(&mut engine_state, &ctrlc);
+    let ctrlc = ctrlc_protection(&mut engine_state);
 
     // Begin: Default NU_LIB_DIRS, NU_PLUGIN_DIRS
     // Set default NU_LIB_DIRS and NU_PLUGIN_DIRS here before the env.nu is processed. If

@@ -1,6 +1,7 @@
 use fancy_regex::Regex;
 use lru::LruCache;
 
+use super::cancel::CancelFlag;
 use super::{usage::build_usage, usage::Usage, StateDelta};
 use super::{
     Command, EnvVars, OverlayFrame, ScopeFrame, Stack, Variable, Visibility, DEFAULT_OVERLAY_NAME,
@@ -193,6 +194,22 @@ impl EngineState {
             is_debugging: IsDebugging::new(false),
             debugger: Arc::new(Mutex::new(Box::new(NoopDebugger))),
         }
+    }
+
+    /// Wire up the flag for `Ctrl-C`/`SIGINT`
+    ///
+    /// This has to be the same `Arc` reference passed to the signal handler.
+    ///
+    /// # Panics
+    /// Panics if you provide an `Arc` that has not yet been shared.
+    /// If you don't need Ctrl-C handling, don't call this.
+    pub fn initialize_cancel_flag(&mut self, ctrl_c: Arc<AtomicBool>) {
+        assert!(
+            Arc::strong_count(&ctrl_c) > 1,
+            "Don't pass a flag that has not been shared and set up with the signal handler"
+        );
+        // Old
+        self.ctrlc = Some(ctrl_c);
     }
 
     /// Merges a `StateDelta` onto the current state. These deltas come from a system, like the parser, that
@@ -1033,6 +1050,29 @@ impl EngineState {
                 NonZeroUsize::new(REGEX_CACHE_SIZE).expect("tried to create cache of size zero"),
             )));
         }
+    }
+
+    /// Reset the flag that alerts us to pressed `Ctrl-C`
+    // Note: takes &mut self out of precaution that it should be a rather exclusive operation
+    pub fn restore_cancel_flag(&mut self) {
+        if let Some(ctrlc) = &self.ctrlc {
+            ctrlc.store(false, Ordering::SeqCst);
+        }
+    }
+
+    /// Get a [`CancelFlag`] that can be cloned and passed when not having access to
+    /// [`EngineState::is_cancelled`]
+    pub fn get_cancel_flag(&self) -> CancelFlag {
+        todo!()
+    }
+
+    /// Check if the engines execution has been stopped by a signal (e.g. `CtrlC`)
+    ///
+    /// If you can not directly read from the `EngineState` use
+    /// [`EngineState::get_cancel_flag()`] to obtain a [`CancelFlag`] that can be observed for
+    /// the same property
+    pub fn is_cancelled(&self) -> bool {
+        todo!()
     }
 }
 
