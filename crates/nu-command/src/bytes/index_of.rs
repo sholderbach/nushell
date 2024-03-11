@@ -76,7 +76,13 @@ impl Command for BytesIndexOf {
             all: call.has_flag(engine_state, stack, "all")?,
             cell_paths,
         };
-        operate(index_of, arg, input, call.head, engine_state.ctrlc.clone())
+        operate(
+            index_of,
+            arg,
+            input,
+            call.head,
+            engine_state.get_cancel_flag(),
+        )
     }
 
     fn examples(&self) -> Vec<Example> {

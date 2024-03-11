@@ -101,7 +101,7 @@ impl Command for Reduce {
         let capture_block: Closure = call.req(engine_state, stack, 0)?;
         let mut stack = stack.captures_to_stack(capture_block.captures);
         let block = engine_state.get_block(capture_block.block_id);
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let eval_block_with_early_return = get_eval_block_with_early_return(engine_state);
 
         let orig_env_vars = stack.env_vars.clone();
@@ -163,7 +163,7 @@ impl Command for Reduce {
             )?
             .into_value(span);
 
-            if nu_utils::ctrl_c::was_pressed(&ctrlc) {
+            if nu_protocol::was_optional_cancel_hit(&ctrlc) {
                 break;
             }
         }

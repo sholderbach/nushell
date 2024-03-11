@@ -49,7 +49,7 @@ impl Command for ToText {
                         separator: line_ending.into(),
                         config: config.clone(),
                     }),
-                    engine_state.ctrlc.clone(),
+                    engine_state.get_cancel_flag(),
                     span,
                     None,
                 )),

@@ -104,7 +104,13 @@ impl Command for SubCommand {
             cell_paths,
             graphemes: grapheme_flags(engine_state, stack, call)?,
         };
-        operate(action, args, input, call.head, engine_state.ctrlc.clone())
+        operate(
+            action,
+            args,
+            input,
+            call.head,
+            engine_state.get_cancel_flag(),
+        )
     }
 
     fn examples(&self) -> Vec<Example> {

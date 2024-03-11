@@ -106,7 +106,7 @@ use it in your pipeline."#
                     let input_from_channel = PipelineData::ExternalStream {
                         stdout: Some(RawStream::new(
                             Box::new(iter),
-                            closure_engine_state.ctrlc.clone(),
+                            closure_engine_state.get_cancel_flag(),
                             span,
                             known_size,
                         )),
@@ -196,7 +196,7 @@ use it in your pipeline."#
                 let teed = tee(input.into_iter(), move |rx| {
                     let input_from_channel = rx.into_pipeline_data_with_metadata(
                         metadata_clone,
-                        closure_engine_state.ctrlc.clone(),
+                        closure_engine_state.get_cancel_flag(),
                     );
                     let result = eval_block_with_early_return(
                         &closure_engine_state,
@@ -211,7 +211,7 @@ use it in your pipeline."#
                 })
                 .map_err(|e| e.into_spanned(call.head))?
                 .map(move |result| result.unwrap_or_else(|err| Value::error(err, closure_span)))
-                .into_pipeline_data_with_metadata(metadata, engine_state.ctrlc.clone());
+                .into_pipeline_data_with_metadata(metadata, engine_state.get_cancel_flag());
 
                 Ok(teed)
             }

@@ -662,7 +662,7 @@ Operating system commands:
         let escape: bool = call.has_flag(engine_state, stack, "escape")?;
         let osc: bool = call.has_flag(engine_state, stack, "osc")?;
         let use_ansi_coloring = engine_state.get_config().use_ansi_coloring;
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
 
         if list {
             return generate_ansi_code_list(ctrlc, call.head, use_ansi_coloring);
@@ -696,7 +696,7 @@ Operating system commands:
         let escape: bool = call.has_flag_const(working_set, "escape")?;
         let osc: bool = call.has_flag_const(working_set, "osc")?;
         let use_ansi_coloring = working_set.get_config().use_ansi_coloring;
-        let ctrlc = working_set.permanent().ctrlc.clone();
+        let ctrlc = working_set.permanent().get_cancel_flag();
 
         if list {
             return generate_ansi_code_list(ctrlc, call.head, use_ansi_coloring);
@@ -835,7 +835,7 @@ pub fn str_to_ansi(s: &str) -> Option<String> {
 }
 
 fn generate_ansi_code_list(
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: CancelFlag,
     call_span: Span,
     use_ansi_coloring: bool,
 ) -> Result<PipelineData, ShellError> {

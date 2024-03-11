@@ -160,7 +160,8 @@ impl Command for Du {
                 Ok(a) => {
                     if a.is_dir() {
                         output.push(
-                            DirInfo::new(a, &params, max_depth, engine_state.ctrlc.clone()).into(),
+                            DirInfo::new(a, &params, max_depth, engine_state.get_cancel_flag())
+                                .into(),
                         );
                     } else if let Ok(v) = FileInfo::new(a, deref, tag) {
                         output.push(v.into());
@@ -172,7 +173,7 @@ impl Command for Du {
             }
         }
 
-        Ok(output.into_pipeline_data(engine_state.ctrlc.clone()))
+        Ok(output.into_pipeline_data(engine_state.get_cancel_flag()))
     }
 
     fn examples(&self) -> Vec<Example> {

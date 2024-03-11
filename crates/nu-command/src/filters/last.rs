@@ -88,7 +88,7 @@ impl Command for Last {
             None => 1,
         };
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let metadata = input.metadata();
 
         // early exit for `last 0`

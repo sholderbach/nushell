@@ -68,7 +68,13 @@ impl Command for SubCommand {
             compare_string,
             cell_paths,
         };
-        operate(action, args, input, call.head, engine_state.ctrlc.clone())
+        operate(
+            action,
+            args,
+            input,
+            call.head,
+            engine_state.get_cancel_flag(),
+        )
     }
 
     fn examples(&self) -> Vec<Example> {

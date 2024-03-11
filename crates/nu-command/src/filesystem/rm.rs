@@ -125,7 +125,7 @@ fn rm(
     let interactive = call.has_flag(engine_state, stack, "interactive")?;
     let interactive_once = call.has_flag(engine_state, stack, "interactive-once")? && !interactive;
 
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
 
     let mut paths = get_rest_for_glob_pattern(engine_state, stack, call, 0)?;
 

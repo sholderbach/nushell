@@ -1,14 +1,16 @@
+use crate::engine::was_optional_cancel_hit;
 use serde::{Deserialize, Serialize};
-use std::{
-    cmp::Ordering,
-    sync::{atomic::AtomicBool, Arc},
-};
+use std::
+    cmp::Ordering
+;
 
 /// A Range is an iterator over integers.
 use crate::{
     ast::{RangeInclusion, RangeOperator},
     *,
 };
+
+use self::engine::CancelFlag;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Range {
@@ -126,10 +128,7 @@ impl Range {
         }
     }
 
-    pub fn into_range_iter(
-        self,
-        ctrlc: Option<Arc<AtomicBool>>,
-    ) -> Result<RangeIterator, ShellError> {
+    pub fn into_range_iter(self, ctrlc: Option<CancelFlag>) -> Result<RangeIterator, ShellError> {
         let span = self.from.span();
 
         Ok(RangeIterator::new(self, ctrlc, span))
@@ -162,11 +161,11 @@ pub struct RangeIterator {
     moves_up: bool,
     incr: Value,
     done: bool,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 }
 
 impl RangeIterator {
-    pub fn new(range: Range, ctrlc: Option<Arc<AtomicBool>>, span: Span) -> RangeIterator {
+    pub fn new(range: Range, ctrlc: Option<CancelFlag>, span: Span) -> RangeIterator {
         let moves_up = range.moves_up();
         let is_end_inclusive = range.is_end_inclusive();
 
@@ -200,7 +199,7 @@ impl Iterator for RangeIterator {
             return None;
         }
 
-        if nu_utils::ctrl_c::was_pressed(&self.ctrlc) {
+        if was_optional_cancel_hit(&self.ctrlc) {
             return None;
         }
 

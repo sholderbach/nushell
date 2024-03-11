@@ -81,7 +81,7 @@ impl Command for For {
 
         let numbered = call.has_flag(engine_state, stack, "numbered")?;
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let engine_state = engine_state.clone();
         let block = engine_state.get_block(block.block_id).clone();
         let redirect_stdout = call.redirect_stdout;

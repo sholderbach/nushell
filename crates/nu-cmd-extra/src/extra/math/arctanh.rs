@@ -45,7 +45,7 @@ impl Command for SubCommand {
         }
         input.map(
             move |value| operate(value, head),
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
     }
 

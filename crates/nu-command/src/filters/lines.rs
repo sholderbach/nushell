@@ -34,7 +34,7 @@ impl Command for Lines {
         input: PipelineData,
     ) -> Result<PipelineData, ShellError> {
         let head = call.head;
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let skip_empty = call.has_flag(engine_state, stack, "skip-empty")?;
 
         let span = input.span().unwrap_or(call.head);
@@ -80,7 +80,7 @@ impl Command for Lines {
                     })
                     .flatten();
 
-                Ok(iter.into_pipeline_data(engine_state.ctrlc.clone()))
+                Ok(iter.into_pipeline_data(engine_state.get_cancel_flag()))
             }
             PipelineData::Value(val, ..) => {
                 match val {

@@ -232,7 +232,7 @@ impl Command for Char {
         let list = call.has_flag_const(working_set, "list")?;
         let integer = call.has_flag_const(working_set, "integer")?;
         let unicode = call.has_flag_const(working_set, "unicode")?;
-        let ctrlc = working_set.permanent().ctrlc.clone();
+        let ctrlc = working_set.permanent().get_cancel_flag();
 
         // handle -l flag
         if list {
@@ -267,7 +267,7 @@ impl Command for Char {
         let list = call.has_flag(engine_state, stack, "list")?;
         let integer = call.has_flag(engine_state, stack, "integer")?;
         let unicode = call.has_flag(engine_state, stack, "unicode")?;
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
 
         // handle -l flag
         if list {
@@ -293,7 +293,7 @@ impl Command for Char {
 }
 
 fn generate_character_list(
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
     call_span: Span,
 ) -> Result<PipelineData, ShellError> {
     Ok(CHAR_MAP

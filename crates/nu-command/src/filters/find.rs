@@ -219,7 +219,7 @@ fn find_with_regex(
     input: PipelineData,
 ) -> Result<PipelineData, ShellError> {
     let span = call.head;
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
     let config = engine_state.get_config().clone();
 
     let insensitive = call.has_flag(engine_state, stack, "ignore-case")?;
@@ -355,7 +355,7 @@ fn find_with_rest_and_highlight(
     input: PipelineData,
 ) -> Result<PipelineData, ShellError> {
     let span = call.head;
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
     let engine_state = engine_state.clone();
     let config = engine_state.get_config().clone();
     let filter_config = engine_state.get_config().clone();

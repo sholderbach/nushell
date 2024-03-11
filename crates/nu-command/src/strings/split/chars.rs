@@ -114,7 +114,7 @@ fn split_chars(
     let graphemes = grapheme_flags(engine_state, stack, call)?;
     input.map(
         move |x| split_chars_helper(&x, span, graphemes),
-        engine_state.ctrlc.clone(),
+        engine_state.get_cancel_flag(),
     )
 }
 

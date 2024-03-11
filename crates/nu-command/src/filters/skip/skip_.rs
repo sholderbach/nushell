@@ -92,7 +92,7 @@ impl Command for Skip {
             None => 1,
         };
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let input_span = input.span().unwrap_or(call.head);
         match input {
             PipelineData::ExternalStream {

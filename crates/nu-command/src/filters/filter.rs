@@ -55,7 +55,7 @@ a variable. On the other hand, the "row condition" syntax is not supported."#
     ) -> Result<PipelineData, ShellError> {
         let capture_block: Closure = call.req(engine_state, stack, 0)?;
         let metadata = input.metadata();
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let engine_state = engine_state.clone();
         let block = engine_state.get_block(capture_block.block_id).clone();
         let mut stack = stack.captures_to_stack(capture_block.captures);

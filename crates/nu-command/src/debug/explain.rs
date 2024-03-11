@@ -41,7 +41,7 @@ impl Command for Explain {
         // This was all delightfully stolen from benchmark :)
         let capture_block: Closure = call.req(engine_state, stack, 0)?;
         let block = engine_state.get_block(capture_block.block_id);
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let mut stack = stack.captures_to_stack(capture_block.captures);
 
         let elements = get_pipeline_elements(engine_state, &mut stack, block, call.head)?;

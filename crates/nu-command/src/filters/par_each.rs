@@ -124,8 +124,8 @@ impl Command for ParEach {
         let max_threads = threads.unwrap_or(0);
         let keep_order = call.has_flag(engine_state, stack, "keep-order")?;
         let metadata = input.metadata();
-        let ctrlc = engine_state.ctrlc.clone();
-        let outer_ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
+        let outer_ctrlc = engine_state.get_cancel_flag();
         let block_id = capture_block.block_id;
         let mut stack = stack.captures_to_stack(capture_block.captures);
         let span = call.head;

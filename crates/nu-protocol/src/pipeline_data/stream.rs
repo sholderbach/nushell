@@ -1,13 +1,14 @@
 use crate::*;
-use std::{
-    fmt::Debug,
-    sync::{atomic::AtomicBool, Arc},
-};
+use std::
+    fmt::Debug
+;
+
+use self::engine::CancelFlag;
 
 pub struct RawStream {
     pub stream: Box<dyn Iterator<Item = Result<Vec<u8>, ShellError>> + Send + 'static>,
     pub leftover: Vec<u8>,
-    pub ctrlc: Option<Arc<AtomicBool>>,
+    pub ctrlc: Option<CancelFlag>,
     pub is_binary: bool,
     pub span: Span,
     pub known_size: Option<u64>, // (bytes)
@@ -16,7 +17,7 @@ pub struct RawStream {
 impl RawStream {
     pub fn new(
         stream: Box<dyn Iterator<Item = Result<Vec<u8>, ShellError>> + Send + 'static>,
-        ctrlc: Option<Arc<AtomicBool>>,
+        ctrlc: Option<CancelFlag>,
         span: Span,
         known_size: Option<u64>,
     ) -> Self {
@@ -34,7 +35,7 @@ impl RawStream {
         let mut output = vec![];
 
         for item in self.stream {
-            if nu_utils::ctrl_c::was_pressed(&self.ctrlc) {
+            if crate::engine::was_optional_cancel_hit(&self.ctrlc) {
                 break;
             }
             output.extend(item?);
@@ -52,7 +53,7 @@ impl RawStream {
         let ctrlc = &self.ctrlc.clone();
 
         for item in self {
-            if nu_utils::ctrl_c::was_pressed(ctrlc) {
+            if crate::engine::was_optional_cancel_hit(ctrlc) {
                 break;
             }
             output.push_str(&item?.coerce_into_string()?);
@@ -95,7 +96,7 @@ impl Iterator for RawStream {
     type Item = Result<Value, ShellError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if nu_utils::ctrl_c::was_pressed(&self.ctrlc) {
+        if crate::engine::was_optional_cancel_hit(&self.ctrlc) {
             return None;
         }
 
@@ -183,7 +184,7 @@ impl Iterator for RawStream {
 /// and the stream cannot be replayed.
 pub struct ListStream {
     pub stream: Box<dyn Iterator<Item = Value> + Send + 'static>,
-    pub ctrlc: Option<Arc<AtomicBool>>,
+    pub ctrlc: Option<CancelFlag>,
     first_guard: bool,
 }
 
@@ -205,7 +206,7 @@ impl ListStream {
 
     pub fn from_stream(
         input: impl Iterator<Item = Value> + Send + 'static,
-        ctrlc: Option<Arc<AtomicBool>>,
+        ctrlc: Option<CancelFlag>,
     ) -> ListStream {
         ListStream {
             stream: Box::new(input),
@@ -236,7 +237,7 @@ impl Iterator for ListStream {
             self.first_guard = false;
             return self.stream.next();
         }
-        if nu_utils::ctrl_c::was_pressed(&self.ctrlc) {
+        if crate::engine::was_optional_cancel_hit(&self.ctrlc) {
             None
         } else {
             self.stream.next()

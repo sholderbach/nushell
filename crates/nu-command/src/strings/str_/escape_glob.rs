@@ -72,7 +72,13 @@ impl Command for SubCommand {
         let cell_paths: Vec<CellPath> = call.rest(engine_state, stack, 0)?;
         let cell_paths = (!cell_paths.is_empty()).then_some(cell_paths);
         let args = Arguments { cell_paths };
-        operate(action, args, input, call.head, engine_state.ctrlc.clone())
+        operate(
+            action,
+            args,
+            input,
+            call.head,
+            engine_state.get_cancel_flag(),
+        )
     }
 
     fn examples(&self) -> Vec<Example> {

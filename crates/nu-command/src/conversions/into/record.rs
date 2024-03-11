@@ -129,7 +129,7 @@ fn into_record(
             ),
         },
         Value::Range { val, .. } => Value::record(
-            val.into_range_iter(engine_state.ctrlc.clone())?
+            val.into_range_iter(engine_state.get_cancel_flag())?
                 .enumerate()
                 .map(|(idx, val)| (format!("{idx}"), val))
                 .collect(),

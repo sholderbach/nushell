@@ -87,7 +87,7 @@ fn convert_value_to_string(value: Value, engine_state: &EngineState, stack: &mut
         let config = engine_state.get_config();
         vals[0][0].to_abbreviated_string(config)
     } else {
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let config = engine_state.get_config();
         let style_computer = StyleComputer::from_config(engine_state, stack);
 

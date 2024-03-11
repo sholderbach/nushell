@@ -140,7 +140,7 @@ pub fn compact(
                     _ => true,
                 }
             },
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
         .map(|m| m.set_metadata(metadata))
 }

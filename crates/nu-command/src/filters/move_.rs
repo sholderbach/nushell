@@ -149,7 +149,7 @@ impl Command for Move {
         };
 
         let metadata = input.metadata();
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let call = call.clone();
 
         match input {

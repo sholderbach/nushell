@@ -32,7 +32,7 @@ impl Command for ScopeExterns {
         _input: PipelineData,
     ) -> Result<PipelineData, ShellError> {
         let span = call.head;
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
 
         let mut scope_data = ScopeData::new(engine_state, stack);
         scope_data.populate_decls();

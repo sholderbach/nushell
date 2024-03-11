@@ -51,7 +51,13 @@ impl Command for SubCommand {
     ) -> Result<PipelineData, ShellError> {
         let cell_paths: Vec<CellPath> = call.rest(engine_state, stack, 0)?;
         let args = CellPathOnlyArgs::from(cell_paths);
-        operate(action, args, input, call.head, engine_state.ctrlc.clone())
+        operate(
+            action,
+            args,
+            input,
+            call.head,
+            engine_state.get_cancel_flag(),
+        )
     }
 
     fn examples(&self) -> Vec<Example> {

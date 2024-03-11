@@ -10,7 +10,7 @@ use std::sync::Arc;
 use crate::nu_common::NuConfig;
 
 pub fn try_build_table(
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
     config: &NuConfig,
     style_computer: &StyleComputer,
     value: Value,
@@ -30,7 +30,7 @@ fn try_build_map(
     record: Record,
     span: Span,
     style_computer: &StyleComputer,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
     config: &NuConfig,
 ) -> String {
     let opts = TableOpts::new(
@@ -55,7 +55,7 @@ fn try_build_map(
 
 fn try_build_list(
     vals: Vec<Value>,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
     config: &NuConfig,
     span: Span,
     style_computer: &StyleComputer,

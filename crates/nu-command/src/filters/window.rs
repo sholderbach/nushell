@@ -117,7 +117,7 @@ impl Command for Window {
         input: PipelineData,
     ) -> Result<PipelineData, ShellError> {
         let group_size: Spanned<usize> = call.req(engine_state, stack, 0)?;
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let metadata = input.metadata();
         let stride: Option<usize> = call.get_flag(engine_state, stack, "stride")?;
         let remainder = call.has_flag(engine_state, stack, "remainder")?;

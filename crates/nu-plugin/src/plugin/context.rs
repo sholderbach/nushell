@@ -1,9 +1,9 @@
-use std::sync::{atomic::AtomicBool, Arc};
+use std::sync::Arc;
 
 use nu_engine::get_eval_block_with_early_return;
 use nu_protocol::{
     ast::Call,
-    engine::{Closure, EngineState, Stack},
+    engine::{CancelFlag, Closure, EngineState, Stack},
     Config, PipelineData, PluginIdentity, ShellError, Span, Spanned, Value,
 };
 
@@ -14,7 +14,7 @@ pub(crate) trait PluginExecutionContext: Send + Sync {
     /// The name of the command being executed
     fn command_name(&self) -> &str;
     /// The interrupt signal, if present
-    fn ctrlc(&self) -> Option<&Arc<AtomicBool>>;
+    fn ctrlc(&self) -> CancelFlag;
     /// Get engine configuration
     fn get_config(&self) -> Result<Config, ShellError>;
     /// Get plugin configuration
@@ -63,8 +63,8 @@ impl PluginExecutionContext for PluginExecutionCommandContext {
         self.engine_state.get_decl(self.call.decl_id).name()
     }
 
-    fn ctrlc(&self) -> Option<&Arc<AtomicBool>> {
-        self.engine_state.ctrlc.as_ref()
+    fn ctrlc(&self) -> CancelFlag {
+        self.engine_state.get_cancel_flag()
     }
 
     fn get_config(&self) -> Result<Config, ShellError> {
@@ -176,8 +176,8 @@ impl PluginExecutionContext for PluginExecutionBogusContext {
         "bogus"
     }
 
-    fn ctrlc(&self) -> Option<&Arc<AtomicBool>> {
-        None
+    fn ctrlc(&self) -> CancelFlag {
+        CancelFlag::placeholder()
     }
 
     fn get_config(&self) -> Result<Config, ShellError> {

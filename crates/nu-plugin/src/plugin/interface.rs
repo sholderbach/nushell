@@ -9,7 +9,7 @@ use std::{
     thread,
 };
 
-use nu_protocol::{ListStream, PipelineData, RawStream, ShellError};
+use nu_protocol::{engine::CancelFlag, ListStream, PipelineData, RawStream, ShellError};
 
 use crate::{
     plugin::Encoder,
@@ -173,7 +173,7 @@ pub(crate) trait InterfaceManager {
     fn read_pipeline_data(
         &self,
         header: PipelineDataHeader,
-        ctrlc: Option<&Arc<AtomicBool>>,
+        ctrlc: Option<CancelFlag>,
     ) -> Result<PipelineData, ShellError> {
         self.prepare_pipeline_data(match header {
             PipelineDataHeader::Empty => PipelineData::Empty,
@@ -181,7 +181,7 @@ pub(crate) trait InterfaceManager {
             PipelineDataHeader::ListStream(info) => {
                 let handle = self.stream_manager().get_handle();
                 let reader = handle.read_stream(info.id, self.get_interface())?;
-                PipelineData::ListStream(ListStream::from_stream(reader, ctrlc.cloned()), None)
+                PipelineData::ListStream(ListStream::from_stream(reader, ctrlc), None)
             }
             PipelineDataHeader::ExternalStream(info) => {
                 let handle = self.stream_manager().get_handle();
@@ -189,7 +189,7 @@ pub(crate) trait InterfaceManager {
                 let new_raw_stream = |raw_info: RawStreamInfo| {
                     let reader = handle.read_stream(raw_info.id, self.get_interface())?;
                     let mut stream =
-                        RawStream::new(Box::new(reader), ctrlc.cloned(), span, raw_info.known_size);
+                        RawStream::new(Box::new(reader), ctrlc, span, raw_info.known_size);
                     stream.is_binary = raw_info.is_binary;
                     Ok::<_, ShellError>(stream)
                 };
@@ -201,7 +201,7 @@ pub(crate) trait InterfaceManager {
                         .map(|list_info| {
                             handle
                                 .read_stream(list_info.id, self.get_interface())
-                                .map(|reader| ListStream::from_stream(reader, ctrlc.cloned()))
+                                .map(|reader| ListStream::from_stream(reader, ctrlc))
                         })
                         .transpose()?,
                     span: info.span,

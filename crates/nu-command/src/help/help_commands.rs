@@ -80,7 +80,7 @@ pub fn help_commands(
 
         return Ok(found_cmds_vec
             .into_iter()
-            .into_pipeline_data(engine_state.ctrlc.clone()));
+            .into_pipeline_data(engine_state.get_cancel_flag()));
     }
 
     if rest.is_empty() {
@@ -88,7 +88,7 @@ pub fn help_commands(
 
         Ok(found_cmds_vec
             .into_iter()
-            .into_pipeline_data(engine_state.ctrlc.clone()))
+            .into_pipeline_data(engine_state.get_cancel_flag()))
     } else {
         let mut name = String::new();
 

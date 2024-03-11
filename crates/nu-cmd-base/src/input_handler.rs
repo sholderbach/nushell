@@ -42,7 +42,7 @@ pub fn operate<C, A>(
     mut arg: A,
     input: PipelineData,
     span: Span,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 ) -> Result<PipelineData, ShellError>
 where
     A: CmdArgument + Send + Sync + 'static,

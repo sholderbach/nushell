@@ -50,7 +50,7 @@ impl Command for Take {
     ) -> Result<PipelineData, ShellError> {
         let rows_desired: usize = call.req(engine_state, stack, 0)?;
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let metadata = input.metadata();
 
         match input {

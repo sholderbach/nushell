@@ -74,7 +74,7 @@ path."#
         }
         input.map(
             move |value| super::operate(&relative_to, &args, value, head),
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
     }
 
@@ -95,7 +95,7 @@ path."#
         }
         input.map(
             move |value| super::operate(&relative_to, &args, value, head),
-            working_set.permanent().ctrlc.clone(),
+            working_set.permanent().get_cancel_flag(),
         )
     }
 

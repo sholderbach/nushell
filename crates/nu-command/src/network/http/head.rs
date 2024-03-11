@@ -138,7 +138,7 @@ fn run_head(
         timeout: call.get_flag(engine_state, stack, "max-time")?,
         redirect: call.get_flag(engine_state, stack, "redirect-mode")?,
     };
-    let ctrl_c = engine_state.ctrlc.clone();
+    let ctrl_c = engine_state.get_cancel_flag();
 
     helper(engine_state, stack, call, args, ctrl_c)
 }
@@ -150,7 +150,7 @@ fn helper(
     stack: &mut Stack,
     call: &Call,
     args: Arguments,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 ) -> Result<PipelineData, ShellError> {
     let span = args.url.span();
     let (requested_url, _) = http_parse_url(call, span, args.url)?;

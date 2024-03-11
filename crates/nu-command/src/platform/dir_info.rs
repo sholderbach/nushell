@@ -81,7 +81,7 @@ impl DirInfo {
         path: impl Into<PathBuf>,
         params: &DirBuilder,
         depth: Option<u64>,
-        ctrl_c: Option<Arc<AtomicBool>>,
+        ctrl_c: Option<CancelFlag>,
     ) -> Self {
         let path = path.into();
 
@@ -106,7 +106,7 @@ impl DirInfo {
         match std::fs::read_dir(&s.path) {
             Ok(d) => {
                 for f in d {
-                    if nu_utils::ctrl_c::was_pressed(&ctrl_c) {
+                    if nu_protocol::was_optional_cancel_hit(&ctrl_c) {
                         break;
                     }
 
@@ -132,7 +132,7 @@ impl DirInfo {
         path: impl Into<PathBuf>,
         mut depth: Option<u64>,
         params: &DirBuilder,
-        ctrl_c: Option<Arc<AtomicBool>>,
+        ctrl_c: Option<CancelFlag>,
     ) -> Self {
         if let Some(current) = depth {
             if let Some(new) = current.checked_sub(1) {

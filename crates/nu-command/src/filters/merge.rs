@@ -94,7 +94,7 @@ repeating this process with row 1, and so on."#
         let merge_value: Value = call.req(engine_state, stack, 0)?;
 
         let metadata = input.metadata();
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let call = call.clone();
 
         match (&input, merge_value) {

@@ -161,7 +161,7 @@ fn upsert(
     let redirect_stderr = call.redirect_stderr;
     let eval_block = get_eval_block(engine_state);
 
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
 
     match input {
         PipelineData::Value(mut value, metadata) => {

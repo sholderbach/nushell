@@ -64,7 +64,7 @@ impl Command for SubCommand {
         let base = base.item;
         input.map(
             move |value| operate(value, head, base),
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
     }
 

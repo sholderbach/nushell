@@ -130,7 +130,7 @@ impl<'a> Pager<'a> {
         &mut self,
         engine_state: &EngineState,
         stack: &mut Stack,
-        ctrlc: CtrlC,
+        ctrlc: CancelFlag,
         mut view: Option<Page>,
         commands: CommandRegistry,
     ) -> Result<Option<Value>> {
@@ -188,7 +188,7 @@ impl<'a> PagerConfig<'a> {
 fn run_pager(
     engine_state: &EngineState,
     stack: &mut Stack,
-    ctrlc: CtrlC,
+    ctrlc: CancelFlag,
     pager: &mut Pager,
     view: Option<Page>,
     commands: CommandRegistry,
@@ -233,7 +233,7 @@ fn render_ui(
     term: &mut Terminal,
     engine_state: &EngineState,
     stack: &mut Stack,
-    ctrlc: CtrlC,
+    ctrlc: CancelFlag,
     pager: &mut Pager<'_>,
     info: &mut ViewInfo,
     view: Option<Page>,
@@ -244,10 +244,8 @@ fn render_ui(
 
     loop {
         // handle CTRLC event
-        if let Some(ctrlc) = ctrlc.clone() {
-            if ctrlc.load(Ordering::SeqCst) {
-                break Ok(None);
-            }
+        if ctrlc.is_interrupted() {
+            break Ok(None);
         }
 
         let mut layout = Layout::default();

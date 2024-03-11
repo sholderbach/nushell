@@ -79,7 +79,13 @@ impl Command for BytesRemove {
             all: call.has_flag(engine_state, stack, "all")?,
         };
 
-        operate(remove, arg, input, call.head, engine_state.ctrlc.clone())
+        operate(
+            remove,
+            arg,
+            input,
+            call.head,
+            engine_state.get_cancel_flag(),
+        )
     }
 
     fn examples(&self) -> Vec<Example> {

@@ -123,7 +123,7 @@ only unwrap the outer list, and leave the variable's contents untouched."#
             .into_pipeline_data()
             .into_iter()
             .chain(input)
-            .into_pipeline_data_with_metadata(metadata, engine_state.ctrlc.clone()))
+            .into_pipeline_data_with_metadata(metadata, engine_state.get_cancel_flag()))
     }
 }
 

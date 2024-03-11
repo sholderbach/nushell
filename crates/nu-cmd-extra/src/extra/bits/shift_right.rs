@@ -94,7 +94,7 @@ impl Command for BitsShr {
             bits,
         };
 
-        operate(action, args, input, head, engine_state.ctrlc.clone())
+        operate(action, args, input, head, engine_state.get_cancel_flag())
     }
 
     fn examples(&self) -> Vec<Example> {

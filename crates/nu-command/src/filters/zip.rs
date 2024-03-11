@@ -100,7 +100,7 @@ impl Command for Zip {
         input: PipelineData,
     ) -> Result<PipelineData, ShellError> {
         let head = call.head;
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let metadata = input.metadata();
         let eval_block_with_early_return = get_eval_block_with_early_return(engine_state);
 

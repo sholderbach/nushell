@@ -94,7 +94,7 @@ impl Command for SkipWhile {
         let var_id = block.signature.get_positional(0).and_then(|arg| arg.var_id);
         let mut stack = stack.captures_to_stack(capture_block.captures);
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let engine_state = engine_state.clone();
 
         let redirect_stdout = call.redirect_stdout;

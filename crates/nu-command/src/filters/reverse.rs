@@ -69,7 +69,7 @@ impl Command for Reverse {
         #[allow(clippy::needless_collect)]
         let v: Vec<_> = input.into_iter_strict(call.head)?.collect();
         let iter = v.into_iter().rev();
-        Ok(iter.into_pipeline_data_with_metadata(metadata, engine_state.ctrlc.clone()))
+        Ok(iter.into_pipeline_data_with_metadata(metadata, engine_state.get_cancel_flag()))
     }
 }
 

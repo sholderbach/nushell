@@ -111,7 +111,7 @@ fn registry_query(
                 *registry_key_span,
             ))
         }
-        Ok(reg_values.into_pipeline_data(engine_state.ctrlc.clone()))
+        Ok(reg_values.into_pipeline_data(engine_state.get_cancel_flag()))
     } else {
         match registry_value {
             Some(value) => {

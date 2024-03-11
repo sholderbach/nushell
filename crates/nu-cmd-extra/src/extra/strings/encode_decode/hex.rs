@@ -91,7 +91,13 @@ pub fn operate(
         cell_paths,
     };
 
-    general_operate(action, args, input, call.head, engine_state.ctrlc.clone())
+    general_operate(
+        action,
+        args,
+        input,
+        call.head,
+        engine_state.get_cancel_flag(),
+    )
 }
 
 fn action(

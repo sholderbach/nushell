@@ -121,8 +121,8 @@ with 'transpose' first."#
         let keep_empty = call.has_flag(engine_state, stack, "keep-empty")?;
 
         let metadata = input.metadata();
-        let ctrlc = engine_state.ctrlc.clone();
-        let outer_ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
+        let outer_ctrlc = engine_state.get_cancel_flag();
         let engine_state = engine_state.clone();
         let block = engine_state.get_block(capture_block.block_id).clone();
         let mut stack = stack.captures_to_stack(capture_block.captures);

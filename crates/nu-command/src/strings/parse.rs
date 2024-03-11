@@ -123,7 +123,7 @@ fn operate(
     let head = call.head;
     let pattern: Spanned<String> = call.req(engine_state, stack, 0)?;
     let regex: bool = call.has_flag(engine_state, stack, "regex")?;
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
 
     let pattern_item = pattern.item;
     let pattern_span = pattern.span;
@@ -304,7 +304,7 @@ pub struct ParseStreamer {
     regex: Regex,
     columns: Vec<String>,
     stream: Box<dyn Iterator<Item = Value> + Send + 'static>,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 }
 
 impl Iterator for ParseStreamer {

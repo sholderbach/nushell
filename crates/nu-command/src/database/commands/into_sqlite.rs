@@ -164,7 +164,7 @@ fn operate(
     let file_name: Spanned<String> = call.req(engine_state, stack, 0)?;
     let table_name: Option<Spanned<String>> = call.get_flag(engine_state, stack, "table-name")?;
     let table = Table::new(&file_name, table_name)?;
-    let ctrl_c = engine_state.ctrlc.clone();
+    let ctrl_c = engine_state.get_cancel_flag();
 
     match action(input, table, span, ctrl_c) {
         Ok(val) => Ok(val.into_pipeline_data()),
@@ -176,7 +176,7 @@ fn action(
     input: PipelineData,
     table: Table,
     span: Span,
-    ctrl_c: Option<Arc<AtomicBool>>,
+    ctrl_c: Option<CancelFlag>,
 ) -> Result<Value, ShellError> {
     match input {
         PipelineData::ListStream(list_stream, _) => {
@@ -205,7 +205,7 @@ fn insert_in_transaction(
     stream: impl Iterator<Item = Value>,
     span: Span,
     mut table: Table,
-    ctrl_c: Option<Arc<AtomicBool>>,
+    ctrl_c: Option<CancelFlag>,
 ) -> Result<Value, ShellError> {
     let mut stream = stream.peekable();
     let first_val = match stream.peek() {

@@ -48,7 +48,7 @@ impl Command for Wrap {
             | PipelineData::ListStream { .. } => Ok(input
                 .into_iter()
                 .map(move |x| Value::record(record! { name.clone() => x }, span))
-                .into_pipeline_data_with_metadata(metadata, engine_state.ctrlc.clone())),
+                .into_pipeline_data_with_metadata(metadata, engine_state.get_cancel_flag())),
             PipelineData::ExternalStream { .. } => Ok(Value::record(
                 record! { name => input.into_value(call.head) },
                 span,

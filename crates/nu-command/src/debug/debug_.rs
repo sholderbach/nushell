@@ -49,7 +49,7 @@ impl Command for Debug {
                     Value::string(x.to_expanded_string(", ", &config), head)
                 }
             },
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
     }
 

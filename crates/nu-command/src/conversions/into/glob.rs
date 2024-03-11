@@ -101,7 +101,7 @@ fn glob_helper(
             let output = stream.into_string()?;
             Ok(Value::glob(output.item, false, head).into_pipeline_data())
         }
-        _ => operate(action, args, input, head, engine_state.ctrlc.clone()),
+        _ => operate(action, args, input, head, engine_state.get_cancel_flag()),
     }
 }
 

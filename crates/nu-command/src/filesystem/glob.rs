@@ -133,7 +133,7 @@ impl Command for Glob {
         call: &Call,
         _input: PipelineData,
     ) -> Result<PipelineData, ShellError> {
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let span = call.head;
         let glob_pattern: Spanned<String> = call.req(engine_state, stack, 0)?;
         let depth = call.get_flag(engine_state, stack, "depth")?;
@@ -227,7 +227,7 @@ impl Command for Glob {
             let result = glob_to_value(ctrlc, glob_results, no_dirs, no_files, no_symlinks, span)?;
             result
                 .into_iter()
-                .into_pipeline_data(engine_state.ctrlc.clone())
+                .into_pipeline_data(engine_state.get_cancel_flag())
         } else {
             let glob_results = glob
                 .walk_with_behavior(
@@ -241,7 +241,7 @@ impl Command for Glob {
             let result = glob_to_value(ctrlc, glob_results, no_dirs, no_files, no_symlinks, span)?;
             result
                 .into_iter()
-                .into_pipeline_data(engine_state.ctrlc.clone())
+                .into_pipeline_data(engine_state.get_cancel_flag())
         })
     }
 }
@@ -262,7 +262,7 @@ fn convert_patterns(columns: &[Value]) -> Result<Vec<String>, ShellError> {
 }
 
 fn glob_to_value<'a>(
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: CancelFlag,
     glob_results: impl Iterator<Item = WalkEntry<'a>>,
     no_dirs: bool,
     no_files: bool,
@@ -271,7 +271,7 @@ fn glob_to_value<'a>(
 ) -> Result<Vec<Value>, ShellError> {
     let mut result: Vec<Value> = Vec::new();
     for entry in glob_results {
-        if nu_utils::ctrl_c::was_pressed(&ctrlc) {
+        if nu_protocol::was_optional_cancel_hit(&ctrlc) {
             result.clear();
             return Err(ShellError::InterruptedByUser { span: None });
         }

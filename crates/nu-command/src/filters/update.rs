@@ -115,7 +115,7 @@ fn update(
     let redirect_stdout = call.redirect_stdout;
     let redirect_stderr = call.redirect_stderr;
 
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
 
     let eval_block = get_eval_block(engine_state);
 

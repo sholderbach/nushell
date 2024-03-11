@@ -180,7 +180,7 @@ pub fn transpose(
         });
     }
 
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
     let metadata = input.metadata();
     let input: Vec<_> = input.into_iter().collect();
 

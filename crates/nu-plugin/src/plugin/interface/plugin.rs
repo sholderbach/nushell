@@ -458,7 +458,7 @@ impl InterfaceManager for PluginInterfaceManager {
                         // If there's an error with initializing this stream, change it to a plugin
                         // error response, but send it anyway
                         let exec_context = self.get_context(id)?;
-                        let ctrlc = exec_context.as_ref().and_then(|c| c.0.ctrlc());
+                        let ctrlc = exec_context.as_ref().map(|c| c.0.ctrlc());
 
                         // Register the streams in the response
                         for stream_id in data.stream_ids() {
@@ -483,7 +483,7 @@ impl InterfaceManager for PluginInterfaceManager {
             PluginOutput::EngineCall { context, id, call } => {
                 // Handle reading the pipeline data, if any
                 let exec_context = self.get_context(context)?;
-                let ctrlc = exec_context.as_ref().and_then(|c| c.0.ctrlc());
+                let ctrlc = exec_context.as_ref().map(|c| c.0.ctrlc());
                 let call = match call {
                     EngineCall::GetConfig => Ok(EngineCall::GetConfig),
                     EngineCall::GetPluginConfig => Ok(EngineCall::GetPluginConfig),

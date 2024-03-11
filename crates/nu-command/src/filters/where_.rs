@@ -66,7 +66,7 @@ not supported."#
         let orig_env_vars = stack.env_vars.clone();
         let orig_env_hidden = stack.env_hidden.clone();
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let engine_state = engine_state.clone();
 
         let redirect_stdout = call.redirect_stdout;

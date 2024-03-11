@@ -208,5 +208,5 @@ fn run_ps(
 
     Ok(output
         .into_iter()
-        .into_pipeline_data(engine_state.ctrlc.clone()))
+        .into_pipeline_data(engine_state.get_cancel_flag()))
 }

@@ -6,12 +6,11 @@ pub use stream::*;
 
 use crate::{
     ast::{Call, PathMember},
-    engine::{EngineState, Stack, StateWorkingSet},
+    engine::{CancelFlag, EngineState, Stack, StateWorkingSet},
     format_error, Config, ShellError, Span, Value,
 };
 use nu_utils::{stderr_write_all_and_flush, stdout_write_all_and_flush};
 use std::io::Write;
-use std::sync::{atomic::AtomicBool, Arc};
 use std::thread;
 
 const LINE_ENDING_PATTERN: &[char] = &['\r', '\n'];
@@ -300,11 +299,11 @@ impl PipelineData {
         }
     }
 
-    pub fn into_interruptible_iter(self, ctrlc: Option<Arc<AtomicBool>>) -> PipelineIterator {
+    pub fn into_interruptible_iter(self, ctrlc: CancelFlag) -> PipelineIterator {
         let mut iter = self.into_iter();
 
         if let PipelineIterator(PipelineData::ListStream(s, ..)) = &mut iter {
-            s.ctrlc = ctrlc;
+            s.ctrlc = Some(ctrlc);
         }
 
         iter
@@ -408,11 +407,7 @@ impl PipelineData {
     }
 
     /// Simplified mapper to help with simple values also. For full iterator support use `.into_iter()` instead
-    pub fn map<F>(
-        self,
-        mut f: F,
-        ctrlc: Option<Arc<AtomicBool>>,
-    ) -> Result<PipelineData, ShellError>
+    pub fn map<F>(self, mut f: F, ctrlc: Option<CancelFlag>) -> Result<PipelineData, ShellError>
     where
         Self: Sized,
         F: FnMut(Value) -> Value + 'static + Send,
@@ -456,7 +451,7 @@ impl PipelineData {
     pub fn flat_map<U: 'static, F>(
         self,
         mut f: F,
-        ctrlc: Option<Arc<AtomicBool>>,
+        ctrlc: Option<CancelFlag>,
     ) -> Result<PipelineData, ShellError>
     where
         Self: Sized,
@@ -501,11 +496,7 @@ impl PipelineData {
         }
     }
 
-    pub fn filter<F>(
-        self,
-        mut f: F,
-        ctrlc: Option<Arc<AtomicBool>>,
-    ) -> Result<PipelineData, ShellError>
+    pub fn filter<F>(self, mut f: F, ctrlc: Option<CancelFlag>) -> Result<PipelineData, ShellError>
     where
         Self: Sized,
         F: FnMut(&Value) -> bool + 'static + Send,
@@ -855,7 +846,7 @@ pub fn print_if_stream(
                 let _ = stderr.write_all(&leftover);
                 drop(leftover);
                 for bytes in stream {
-                    if nu_utils::ctrl_c::was_pressed(&ctrlc) {
+                    if crate::engine::was_optional_cancel_hit(&ctrlc) {
                         break;
                     }
                     if let Ok(bytes) = bytes {
@@ -946,11 +937,11 @@ where
 }
 
 pub trait IntoInterruptiblePipelineData {
-    fn into_pipeline_data(self, ctrlc: Option<Arc<AtomicBool>>) -> PipelineData;
+    fn into_pipeline_data(self, ctrlc: CancelFlag) -> PipelineData;
     fn into_pipeline_data_with_metadata(
         self,
         metadata: impl Into<Option<PipelineMetadata>>,
-        ctrlc: Option<Arc<AtomicBool>>,
+        ctrlc: CancelFlag,
     ) -> PipelineData;
 }
 
@@ -960,9 +951,9 @@ where
     I::IntoIter: Send + 'static,
     <I::IntoIter as Iterator>::Item: Into<Value>,
 {
-    fn into_pipeline_data(self, ctrlc: Option<Arc<AtomicBool>>) -> PipelineData {
+    fn into_pipeline_data(self, ctrlc: CancelFlag) -> PipelineData {
         PipelineData::ListStream(
-            ListStream::from_stream(self.into_iter().map(Into::into), ctrlc),
+            ListStream::from_stream(self.into_iter().map(Into::into), Some(ctrlc)),
             None,
         )
     }
@@ -970,10 +961,10 @@ where
     fn into_pipeline_data_with_metadata(
         self,
         metadata: impl Into<Option<PipelineMetadata>>,
-        ctrlc: Option<Arc<AtomicBool>>,
+        ctrlc: CancelFlag,
     ) -> PipelineData {
         PipelineData::ListStream(
-            ListStream::from_stream(self.into_iter().map(Into::into), ctrlc),
+            ListStream::from_stream(self.into_iter().map(Into::into), Some(ctrlc)),
             metadata.into(),
         )
     }

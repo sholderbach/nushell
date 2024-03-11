@@ -96,6 +96,6 @@ impl Command for PluginList {
                 "commands" => Value::list(commands, span),
             }, span)
         }).collect::<Vec<Value>>();
-        Ok(list.into_pipeline_data(engine_state.ctrlc.clone()))
+        Ok(list.into_pipeline_data(engine_state.get_cancel_flag()))
     }
 }

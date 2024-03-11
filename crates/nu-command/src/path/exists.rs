@@ -69,7 +69,7 @@ If you need to distinguish dirs and files, please use `path type`."#
         }
         input.map(
             move |value| super::operate(&exists, &args, value, head),
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
     }
 
@@ -90,7 +90,7 @@ If you need to distinguish dirs and files, please use `path type`."#
         }
         input.map(
             move |value| super::operate(&exists, &args, value, head),
-            working_set.permanent().ctrlc.clone(),
+            working_set.permanent().get_cancel_flag(),
         )
     }
 

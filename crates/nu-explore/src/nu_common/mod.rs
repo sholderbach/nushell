@@ -13,7 +13,7 @@ pub use nu_ansi_term::{Color as NuColor, Style as NuStyle};
 pub use nu_protocol::{Config as NuConfig, Span as NuSpan};
 
 pub type NuText = (String, TextStyle);
-pub type CtrlC = Option<Arc<AtomicBool>>;
+pub type CtrlC = Option<CancelFlag>;
 
 pub use command::run_command_with_value;
 pub use lscolor::{create_lscolors, lscolorize};

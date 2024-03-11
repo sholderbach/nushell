@@ -56,7 +56,7 @@ impl Command for Enumerate {
         input: PipelineData,
     ) -> Result<PipelineData, ShellError> {
         let metadata = input.metadata();
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let span = call.head;
 
         Ok(input

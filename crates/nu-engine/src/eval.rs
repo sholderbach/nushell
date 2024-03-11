@@ -21,7 +21,7 @@ pub fn eval_call<D: DebugContext>(
     call: &Call,
     input: PipelineData,
 ) -> Result<PipelineData, ShellError> {
-    if nu_utils::ctrl_c::was_pressed(&engine_state.ctrlc) {
+    if engine_state.is_cancelled() {
         return Ok(Value::nothing(call.head).into_pipeline_data());
     }
     let decl = engine_state.get_decl(call.decl_id);

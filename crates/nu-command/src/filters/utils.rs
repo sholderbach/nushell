@@ -39,7 +39,7 @@ pub fn boolean_fold(
     let orig_env_vars = stack.env_vars.clone();
     let orig_env_hidden = stack.env_hidden.clone();
 
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
 
     // TODO: This Clippy lint is incorrectly triggered in our CI for come reason
     #[allow(clippy::needless_borrow)]

@@ -247,7 +247,7 @@ fn rename(
                     ),
                 }
             },
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
         .map(|x| x.set_metadata(metadata))
 }

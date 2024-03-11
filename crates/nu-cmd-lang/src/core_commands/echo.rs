@@ -73,7 +73,7 @@ fn run(
         match n.cmp(&1usize) {
             //  More than one value is converted in a stream of values
             std::cmp::Ordering::Greater => PipelineData::ListStream(
-                ListStream::from_stream(to_be_echoed.into_iter(), engine_state.ctrlc.clone()),
+                ListStream::from_stream(to_be_echoed.into_iter(), engine_state.get_cancel_flag()),
                 None,
             ),
 

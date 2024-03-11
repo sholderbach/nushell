@@ -31,7 +31,7 @@ mod util {
 fn run_pager(
     engine_state: &EngineState,
     stack: &mut Stack,
-    ctrlc: CtrlC,
+    ctrlc: CancelFlag,
     input: PipelineData,
     config: PagerConfig,
 ) -> io::Result<Option<Value>> {

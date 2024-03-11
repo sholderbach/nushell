@@ -48,7 +48,13 @@ where
         case_operation,
         cell_paths,
     };
-    general_operate(action, args, input, call.head, engine_state.ctrlc.clone())
+    general_operate(
+        action,
+        args,
+        input,
+        call.head,
+        engine_state.get_cancel_flag(),
+    )
 }
 
 fn action<F>(input: &Value, args: &Arguments<F>, head: Span) -> Value

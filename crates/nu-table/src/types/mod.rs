@@ -30,7 +30,7 @@ impl TableOutput {
 
 #[derive(Debug, Clone)]
 pub struct TableOpts<'a> {
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
     config: &'a Config,
     style_computer: &'a StyleComputer<'a>,
     span: Span,
@@ -46,7 +46,7 @@ impl<'a> TableOpts<'a> {
     pub fn new(
         config: &'a Config,
         style_computer: &'a StyleComputer<'a>,
-        ctrlc: Option<Arc<AtomicBool>>,
+        ctrlc: Option<CancelFlag>,
         span: Span,
         width: usize,
         indent: (usize, usize),

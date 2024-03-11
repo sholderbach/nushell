@@ -145,7 +145,13 @@ fn into_bits(
         }
         _ => {
             let args = Arguments { cell_paths };
-            operate(action, args, input, call.head, engine_state.ctrlc.clone())
+            operate(
+                action,
+                args,
+                input,
+                call.head,
+                engine_state.get_cancel_flag(),
+            )
         }
     }
 }

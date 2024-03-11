@@ -34,7 +34,7 @@ impl Command for NuHighlight {
     ) -> Result<PipelineData, ShellError> {
         let head = call.head;
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let engine_state = std::sync::Arc::new(engine_state.clone());
         let config = engine_state.get_config().clone();
 

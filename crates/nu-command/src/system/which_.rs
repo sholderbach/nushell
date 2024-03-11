@@ -228,7 +228,7 @@ fn which(
         applications: call.rest(engine_state, stack, 0)?,
         all: call.has_flag(engine_state, stack, "all")?,
     };
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
 
     if which_args.applications.is_empty() {
         return Err(ShellError::MissingParameter {

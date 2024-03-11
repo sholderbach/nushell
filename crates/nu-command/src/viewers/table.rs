@@ -379,10 +379,10 @@ fn handle_table_command(
                 vec![Ok(hex)]
             };
 
-            let ctrlc = input.engine_state.ctrlc.clone();
+            let ctrlc = input.engine_state.get_cancel_flag();
             let stream = RawStream::new(
                 Box::new(stream_list.into_iter()),
-                ctrlc,
+                Some(ctrlc),
                 input.call.head,
                 None,
             );
@@ -398,8 +398,8 @@ fn handle_table_command(
         }
         // None of these two receive a StyleComputer because handle_row_stream() can produce it by itself using engine_state and stack.
         PipelineData::Value(Value::List { vals, .. }, metadata) => {
-            let ctrlc = input.engine_state.ctrlc.clone();
-            let stream = ListStream::from_stream(vals.into_iter(), ctrlc);
+            let ctrlc = input.engine_state.get_cancel_flag();
+            let stream = ListStream::from_stream(vals.into_iter(), Some(ctrlc));
             input.data = PipelineData::Empty;
 
             handle_row_stream(input, cfg, stream, metadata)
@@ -426,7 +426,7 @@ fn handle_table_command(
             Table.run(input.engine_state, input.stack, input.call, base_pipeline)
         }
         PipelineData::Value(Value::Range { val, .. }, metadata) => {
-            let ctrlc = input.engine_state.ctrlc.clone();
+            let ctrlc = input.engine_state.get_cancel_flag();
             let stream = ListStream::from_stream(val.into_range_iter(ctrlc.clone())?, ctrlc);
             input.data = PipelineData::Empty;
             handle_row_stream(input, cfg, stream, metadata)
@@ -443,7 +443,7 @@ fn handle_record(
     let config = get_config(input.engine_state, input.stack);
     let span = input.data.span().unwrap_or(input.call.head);
     let styles = &StyleComputer::from_config(input.engine_state, input.stack);
-    let ctrlc = input.engine_state.ctrlc.clone();
+    let ctrlc = input.engine_state.get_cancel_flag();
     let ctrlc1 = ctrlc.clone();
 
     if record.is_empty() {
@@ -489,8 +489,8 @@ fn handle_record(
     Ok(val.into_pipeline_data())
 }
 
-fn report_unsuccessful_output(ctrlc1: Option<Arc<AtomicBool>>, term_width: usize) -> String {
-    if nu_utils::ctrl_c::was_pressed(&ctrlc1) {
+fn report_unsuccessful_output(ctrlc1: Option<CancelFlag>, term_width: usize) -> String {
+    if nu_protocol::was_optional_cancel_hit(&ctrlc1) {
         "".into()
     } else {
         // assume this failed because the table was too wide
@@ -551,7 +551,7 @@ fn handle_row_stream(
     stream: ListStream,
     metadata: Option<PipelineMetadata>,
 ) -> Result<PipelineData, ShellError> {
-    let ctrlc = input.engine_state.ctrlc.clone();
+    let ctrlc = input.engine_state.get_cancel_flag();
 
     let stream = match metadata.as_ref() {
         // First, `ls` sources:
@@ -687,7 +687,7 @@ struct PagingTableCreator {
     stream: ListStream,
     engine_state: EngineState,
     stack: Stack,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
     elements_displayed: usize,
     reached_end: bool,
     cfg: TableConfig,
@@ -700,7 +700,7 @@ impl PagingTableCreator {
         stream: ListStream,
         engine_state: EngineState,
         stack: Stack,
-        ctrlc: Option<Arc<AtomicBool>>,
+        ctrlc: Option<CancelFlag>,
         cfg: TableConfig,
     ) -> Self {
         PagingTableCreator {
@@ -846,7 +846,7 @@ impl Iterator for PagingTableCreator {
 fn stream_collect(
     stream: &mut ListStream,
     size: usize,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 ) -> (Vec<Value>, bool) {
     let start_time = Instant::now();
     let mut end = true;
@@ -866,7 +866,7 @@ fn stream_collect(
             break;
         }
 
-        if nu_utils::ctrl_c::was_pressed(&ctrlc) {
+        if nu_protocol::was_optional_cancel_hit(&ctrlc) {
             break;
         }
     }
@@ -877,7 +877,7 @@ fn stream_collect(
 fn stream_collect_abbriviated(
     stream: &mut ListStream,
     size: usize,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 ) -> (Vec<Value>, usize, bool) {
     let mut end = true;
     let mut read = 0;
@@ -900,7 +900,7 @@ fn stream_collect_abbriviated(
             tail.push_back(item);
         }
 
-        if nu_utils::ctrl_c::was_pressed(&ctrlc) {
+        if nu_protocol::was_optional_cancel_hit(&ctrlc) {
             end = false;
             break;
         }
@@ -1029,7 +1029,7 @@ fn create_empty_placeholder(
 fn convert_table_to_output(
     table: Result<Option<String>, ShellError>,
     config: &Config,
-    ctrlc: &Option<Arc<AtomicBool>>,
+    ctrlc: &Option<CancelFlag>,
     term_width: usize,
 ) -> Option<Result<Vec<u8>, ShellError>> {
     match table {
@@ -1042,7 +1042,7 @@ fn convert_table_to_output(
             Some(Ok(bytes))
         }
         Ok(None) => {
-            let msg = if nu_utils::ctrl_c::was_pressed(ctrlc) {
+            let msg = if nu_protocol::was_optional_cancel_hit(ctrlc) {
                 String::from("")
             } else {
                 // assume this failed because the table was too wide

@@ -125,7 +125,7 @@ pub fn response_to_buffer(
             Box::new(BufferedReader {
                 input: buffered_input,
             }),
-            engine_state.ctrlc.clone(),
+            Some(engine_state.get_cancel_flag()),
             span,
             buffer_size,
         )),
@@ -186,7 +186,7 @@ pub fn send_request(
     request: Request,
     body: Option<Value>,
     content_type: Option<String>,
-    ctrl_c: Option<Arc<AtomicBool>>,
+    ctrl_c: Option<CancelFlag>,
 ) -> Result<Response, ShellErrorOrRequestError> {
     let request_url = request.url().to_string();
     if body.is_none() {
@@ -272,7 +272,7 @@ pub fn send_request(
 fn send_cancellable_request(
     request_url: &str,
     request_fn: Box<dyn FnOnce() -> Result<Response, Error> + Sync + Send>,
-    ctrl_c: Option<Arc<AtomicBool>>,
+    ctrl_c: Option<CancelFlag>,
 ) -> Result<Response, ShellErrorOrRequestError> {
     let (tx, rx) = mpsc::channel::<Result<Response, Error>>();
 
@@ -287,7 +287,7 @@ fn send_cancellable_request(
 
     // ...and poll the channel for responses
     loop {
-        if nu_utils::ctrl_c::was_pressed(&ctrl_c) {
+        if nu_protocol::was_optional_cancel_hit(&ctrl_c) {
             // Return early and give up on the background thread. The connection will either time out or be disconnected
             return Err(ShellErrorOrRequestError::ShellError(
                 ShellError::InterruptedByUser { span: None },

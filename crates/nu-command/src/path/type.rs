@@ -63,7 +63,7 @@ If nothing is found, an empty string will be returned."#
         }
         input.map(
             move |value| super::operate(&r#type, &args, value, head),
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
     }
 
@@ -82,7 +82,7 @@ If nothing is found, an empty string will be returned."#
         }
         input.map(
             move |value| super::operate(&r#type, &args, value, head),
-            working_set.permanent().ctrlc.clone(),
+            working_set.permanent().get_cancel_flag(),
         )
     }
 

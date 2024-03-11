@@ -112,7 +112,13 @@ fn into_bool(
 ) -> Result<PipelineData, ShellError> {
     let cell_paths: Vec<CellPath> = call.rest(engine_state, stack, 0)?;
     let args = CellPathOnlyArgs::from(cell_paths);
-    operate(action, args, input, call.head, engine_state.ctrlc.clone())
+    operate(
+        action,
+        args,
+        input,
+        call.head,
+        engine_state.get_cancel_flag(),
+    )
 }
 
 fn string_to_boolean(s: &str, span: Span) -> Result<bool, ShellError> {

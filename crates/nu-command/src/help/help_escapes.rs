@@ -47,7 +47,7 @@ impl Command for HelpEscapes {
 
         Ok(recs
             .into_iter()
-            .into_pipeline_data(engine_state.ctrlc.clone()))
+            .into_pipeline_data(engine_state.get_cancel_flag()))
     }
 }
 

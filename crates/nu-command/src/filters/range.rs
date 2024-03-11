@@ -102,7 +102,7 @@ impl Command for Range {
                 Ok(PipelineData::Value(Value::nothing(call.head), None))
             } else {
                 let iter = v.into_iter().skip(from).take(to - from + 1);
-                Ok(iter.into_pipeline_data(engine_state.ctrlc.clone()))
+                Ok(iter.into_pipeline_data(engine_state.get_cancel_flag()))
             }
         } else {
             let from = rows_from as usize;
@@ -112,7 +112,7 @@ impl Command for Range {
                 Ok(PipelineData::Value(Value::nothing(call.head), None))
             } else {
                 let iter = input.into_iter().skip(from).take(to - from + 1);
-                Ok(iter.into_pipeline_data(engine_state.ctrlc.clone()))
+                Ok(iter.into_pipeline_data(engine_state.get_cancel_flag()))
             }
         }
         .map(|x| x.set_metadata(metadata))

@@ -101,7 +101,7 @@ used as the next argument to the closure, otherwise generation stops.
         let capture_block: Spanned<Closure> = call.req(engine_state, stack, 1)?;
         let block_span = capture_block.span;
         let block = engine_state.get_block(capture_block.item.block_id).clone();
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let engine_state = engine_state.clone();
         let mut stack = stack.captures_to_stack(capture_block.item.captures);
         let orig_env_vars = stack.env_vars.clone();

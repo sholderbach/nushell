@@ -71,7 +71,7 @@ impl Command for FormatDate {
                 Some(format) => format_helper(value, format.item.as_str(), format.span, head),
                 None => format_helper_rfc2822(value, head),
             },
-            engine_state.ctrlc.clone(),
+            engine_state.get_cancel_flag(),
         )
     }
 

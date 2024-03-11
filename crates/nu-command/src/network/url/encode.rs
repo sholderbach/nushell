@@ -59,10 +59,16 @@ impl Command for SubCommand {
                 args,
                 input,
                 call.head,
-                engine_state.ctrlc.clone(),
+                engine_state.get_cancel_flag(),
             )
         } else {
-            operate(action, args, input, call.head, engine_state.ctrlc.clone())
+            operate(
+                action,
+                args,
+                input,
+                call.head,
+                engine_state.get_cancel_flag(),
+            )
         }
     }
 

@@ -68,7 +68,7 @@ If multiple cell paths are given, this will produce a list of values."#
         let mut rest: Vec<CellPath> = call.rest(engine_state, stack, 1)?;
         let ignore_errors = call.has_flag(engine_state, stack, "ignore-errors")?;
         let sensitive = call.has_flag(engine_state, stack, "sensitive")?;
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let metadata = input.metadata();
 
         if ignore_errors {

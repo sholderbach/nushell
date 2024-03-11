@@ -52,7 +52,7 @@ impl Command for History {
         if let Some(config_path) = nu_path::config_dir() {
             let clear = call.has_flag(engine_state, stack, "clear")?;
             let long = call.has_flag(engine_state, stack, "long")?;
-            let ctrlc = engine_state.ctrlc.clone();
+            let ctrlc = engine_state.get_cancel_flag();
 
             let mut history_path = config_path;
             history_path.push("nushell");

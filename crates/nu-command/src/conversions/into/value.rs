@@ -64,7 +64,7 @@ impl Command for IntoValue {
     ) -> Result<PipelineData, ShellError> {
         let engine_state = engine_state.clone();
         let metadata = input.metadata();
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let span = call.head;
         let display_as_filesizes = call.has_flag(&engine_state, stack, "prefer-filesizes")?;
 

@@ -101,7 +101,7 @@ impl Command for UpdateCells {
         let orig_env_hidden = stack.env_hidden.clone();
 
         let metadata = input.metadata();
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let block: Block = engine_state.get_block(block.block_id).clone();
         let eval_block_fn = get_eval_block(&engine_state);
 

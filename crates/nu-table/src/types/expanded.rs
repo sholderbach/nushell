@@ -105,7 +105,7 @@ fn expanded_table_list(input: &[Value], cfg: Cfg<'_>) -> TableResult {
         }
 
         for (row, item) in input.iter().enumerate() {
-            if nu_utils::ctrl_c::was_pressed(&cfg.opts.ctrlc) {
+            if nu_protocol::was_optional_cancel_hit(&cfg.opts.ctrlc) {
                 return Ok(None);
             }
 
@@ -146,7 +146,7 @@ fn expanded_table_list(input: &[Value], cfg: Cfg<'_>) -> TableResult {
         }
 
         for (row, item) in input.iter().enumerate() {
-            if nu_utils::ctrl_c::was_pressed(&cfg.opts.ctrlc) {
+            if nu_protocol::was_optional_cancel_hit(&cfg.opts.ctrlc) {
                 return Ok(None);
             }
 
@@ -233,7 +233,7 @@ fn expanded_table_list(input: &[Value], cfg: Cfg<'_>) -> TableResult {
         }
 
         for (row, item) in input.iter().enumerate() {
-            if nu_utils::ctrl_c::was_pressed(&cfg.opts.ctrlc) {
+            if nu_protocol::was_optional_cancel_hit(&cfg.opts.ctrlc) {
                 return Ok(None);
             }
 
@@ -356,7 +356,7 @@ fn expanded_table_kv(record: &Record, cfg: Cfg<'_>) -> StringResult {
 
     let mut data = Vec::with_capacity(record.len());
     for (key, value) in record {
-        if nu_utils::ctrl_c::was_pressed(&cfg.opts.ctrlc) {
+        if nu_protocol::was_optional_cancel_hit(&cfg.opts.ctrlc) {
             return Ok(None);
         }
 

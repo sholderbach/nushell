@@ -107,7 +107,7 @@ fn drop_cols(
                             Err(e) => Value::error(e, head),
                         }
                     }))
-                    .into_pipeline_data_with_metadata(metadata, engine_state.ctrlc.clone()))
+                    .into_pipeline_data_with_metadata(metadata, engine_state.get_cancel_flag()))
             } else {
                 Ok(PipelineData::Empty)
             }

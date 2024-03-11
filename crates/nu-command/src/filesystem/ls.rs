@@ -83,7 +83,7 @@ impl Command for Ls {
         let du = call.has_flag(engine_state, stack, "du")?;
         let directory = call.has_flag(engine_state, stack, "directory")?;
         let use_mime_type = call.has_flag(engine_state, stack, "mime-type")?;
-        let ctrl_c = engine_state.ctrlc.clone();
+        let ctrl_c = engine_state.get_cancel_flag();
         let call_span = call.head;
         let cwd = current_dir(engine_state, stack)?;
 
@@ -310,7 +310,7 @@ impl Command for Ls {
                 PipelineMetadata {
                     data_source: DataSource::Ls,
                 },
-                engine_state.ctrlc.clone(),
+                engine_state.get_cancel_flag(),
             ))
     }
 
@@ -457,7 +457,7 @@ pub(crate) fn dir_entry_dict(
     span: Span,
     long: bool,
     du: bool,
-    ctrl_c: Option<Arc<AtomicBool>>,
+    ctrl_c: Option<CancelFlag>,
     use_mime_type: bool,
 ) -> Result<Value, ShellError> {
     #[cfg(windows)]

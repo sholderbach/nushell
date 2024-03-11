@@ -68,7 +68,7 @@ impl Command for Explore {
         let is_reverse: bool = call.has_flag(engine_state, stack, "reverse")?;
         let peek_value: bool = call.has_flag(engine_state, stack, "peek")?;
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
         let nu_config = engine_state.get_config();
         let style_computer = StyleComputer::from_config(engine_state, stack);
 

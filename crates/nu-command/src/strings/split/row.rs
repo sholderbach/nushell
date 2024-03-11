@@ -139,7 +139,7 @@ fn split_row(
     let max_split: Option<usize> = call.get_flag(engine_state, stack, "number")?;
     input.flat_map(
         move |x| split_row_helper(&x, &regex, max_split, name_span),
-        engine_state.ctrlc.clone(),
+        engine_state.get_cancel_flag(),
     )
 }
 

@@ -135,7 +135,13 @@ fn run(
         cell_paths: (!cell_paths.is_empty()).then_some(cell_paths),
         graphemes,
     };
-    operate(action, args, input, call.head, engine_state.ctrlc.clone())
+    operate(
+        action,
+        args,
+        input,
+        call.head,
+        engine_state.get_cancel_flag(),
+    )
 }
 
 fn action(input: &Value, arg: &Arguments, head: Span) -> Value {

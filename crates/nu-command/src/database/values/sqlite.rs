@@ -26,11 +26,11 @@ pub struct SQLiteDatabase {
     #[serde(skip)]
     // this understandably can't be serialized. think that's OK, I'm not aware of a
     // reason why a CustomValue would be serialized outside of a plugin
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 }
 
 impl SQLiteDatabase {
-    pub fn new(path: &Path, ctrlc: Option<Arc<AtomicBool>>) -> Self {
+    pub fn new(path: &Path, ctrlc: Option<CancelFlag>) -> Self {
         Self {
             path: PathBuf::from(path),
             ctrlc,
@@ -40,7 +40,7 @@ impl SQLiteDatabase {
     pub fn try_from_path(
         path: &Path,
         span: Span,
-        ctrlc: Option<Arc<AtomicBool>>,
+        ctrlc: Option<CancelFlag>,
     ) -> Result<Self, ShellError> {
         let mut file = File::open(path).map_err(|e| ShellError::ReadingFile {
             msg: e.to_string(),
@@ -418,7 +418,7 @@ pub fn open_sqlite_db(path: &Path, call_span: Span) -> Result<Connection, ShellE
 fn run_sql_query(
     conn: Connection,
     sql: &Spanned<String>,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 ) -> Result<Value, SqliteError> {
     let stmt = conn.prepare(&sql.item)?;
     prepared_statement_to_nu_list(stmt, sql.span, ctrlc)
@@ -428,7 +428,7 @@ fn read_single_table(
     conn: Connection,
     table_name: String,
     call_span: Span,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 ) -> Result<Value, SqliteError> {
     let stmt = conn.prepare(&format!("SELECT * FROM [{table_name}]"))?;
     prepared_statement_to_nu_list(stmt, call_span, ctrlc)
@@ -437,7 +437,7 @@ fn read_single_table(
 fn prepared_statement_to_nu_list(
     mut stmt: Statement,
     call_span: Span,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 ) -> Result<Value, SqliteError> {
     let column_names = stmt
         .column_names()
@@ -457,7 +457,7 @@ fn prepared_statement_to_nu_list(
     let mut row_values = vec![];
 
     for row_result in row_results {
-        if nu_utils::ctrl_c::was_pressed(&ctrlc) {
+        if nu_protocol::was_optional_cancel_hit(&ctrlc) {
             // return whatever we have so far, let the caller decide whether to use it
             return Ok(Value::list(row_values, call_span));
         }
@@ -473,7 +473,7 @@ fn prepared_statement_to_nu_list(
 fn read_entire_sqlite_db(
     conn: Connection,
     call_span: Span,
-    ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<CancelFlag>,
 ) -> Result<Value, SqliteError> {
     let mut tables = Record::new();
 

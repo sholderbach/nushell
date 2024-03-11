@@ -210,7 +210,7 @@ impl ExternalCommand {
     ) -> Result<PipelineData, ShellError> {
         let head = self.name.span;
 
-        let ctrlc = engine_state.ctrlc.clone();
+        let ctrlc = engine_state.get_cancel_flag();
 
         #[allow(unused_mut)]
         let (cmd, mut reader) = self.create_process(&input, false, head)?;
@@ -557,7 +557,7 @@ impl ExternalCommand {
                     stdout: if redirect_stdout || redirect_combine {
                         Some(RawStream::new(
                             Box::new(stdout_receiver),
-                            output_ctrlc.clone(),
+                            Some(output_ctrlc.clone()),
                             head,
                             None,
                         ))
@@ -567,7 +567,7 @@ impl ExternalCommand {
                     stderr: if redirect_stderr {
                         Some(RawStream::new(
                             Box::new(stderr_receiver),
-                            output_ctrlc.clone(),
+                            Some(output_ctrlc.clone()),
                             head,
                             None,
                         ))
@@ -576,7 +576,7 @@ impl ExternalCommand {
                     },
                     exit_code: Some(ListStream::from_stream(
                         Box::new(exit_code_receiver),
-                        output_ctrlc,
+                        Some(output_ctrlc),
                     )),
                     span: head,
                     metadata: None,
@@ -828,11 +828,8 @@ fn remove_quotes(input: String) -> String {
 //
 // `ctrlc` is used to control the process, if ctrl-c is pressed, the read and redirect
 // process will be breaked.
-fn read_and_redirect_message<R>(
-    reader: R,
-    sender: SyncSender<Vec<u8>>,
-    ctrlc: Option<Arc<AtomicBool>>,
-) where
+fn read_and_redirect_message<R>(reader: R, sender: SyncSender<Vec<u8>>, ctrlc: CancelFlag)
+where
     R: Read,
 {
     // read using the BufferReader. It will do so until there is an
@@ -851,7 +848,7 @@ fn read_and_redirect_message<R>(
         let length = bytes.len();
         buf_read.consume(length);
 
-        if nu_utils::ctrl_c::was_pressed(&ctrlc) {
+        if ctrlc.is_interrupting() {
             break;
         }
 

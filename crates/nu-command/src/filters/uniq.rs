@@ -247,7 +247,7 @@ pub fn uniq(
     item_mapper: Box<dyn Fn(ItemMapperState) -> ValueCounter>,
     metadata: Option<PipelineMetadata>,
 ) -> Result<PipelineData, ShellError> {
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
     let head = call.head;
     let flag_show_count = call.has_flag(engine_state, stack, "count")?;
     let flag_show_repeated = call.has_flag(engine_state, stack, "repeated")?;
@@ -258,7 +258,7 @@ pub fn uniq(
         .into_iter()
         .enumerate()
         .map_while(|(index, item)| {
-            if nu_utils::ctrl_c::was_pressed(&ctrlc) {
+            if nu_protocol::was_optional_cancel_hit(&ctrlc) {
                 return None;
             }
             Some(item_mapper(ItemMapperState {

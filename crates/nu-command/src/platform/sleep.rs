@@ -53,7 +53,7 @@ impl Command for Sleep {
         let total_dur =
             duration_from_i64(duration) + rest.into_iter().map(duration_from_i64).sum::<Duration>();
 
-        let ctrlc_ref = &engine_state.ctrlc.clone();
+        let ctrlc_ref = &engine_state.get_cancel_flag();
         let start = Instant::now();
         loop {
             thread::sleep(CTRL_C_CHECK_INTERVAL.min(total_dur));
@@ -61,7 +61,7 @@ impl Command for Sleep {
                 break;
             }
 
-            if nu_utils::ctrl_c::was_pressed(ctrlc_ref) {
+            if nu_protocol::was_optional_cancel_hit(ctrlc_ref) {
                 return Err(ShellError::InterruptedByUser {
                     span: Some(call.head),
                 });

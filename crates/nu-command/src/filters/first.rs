@@ -97,7 +97,7 @@ fn first_helper(
         None => 1,
     };
 
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
     let metadata = input.metadata();
 
     // early exit for `first 0`

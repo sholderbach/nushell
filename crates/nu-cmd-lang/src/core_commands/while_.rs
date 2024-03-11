@@ -49,7 +49,7 @@ impl Command for While {
         let eval_block = get_eval_block(engine_state);
 
         loop {
-            if nu_utils::ctrl_c::was_pressed(&engine_state.ctrlc) {
+            if engine_state.is_cancelled() {
                 break;
             }
 

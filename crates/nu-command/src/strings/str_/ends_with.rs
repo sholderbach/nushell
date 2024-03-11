@@ -68,7 +68,13 @@ impl Command for SubCommand {
             cell_paths,
             case_insensitive: call.has_flag(engine_state, stack, "ignore-case")?,
         };
-        operate(action, args, input, call.head, engine_state.ctrlc.clone())
+        operate(
+            action,
+            args,
+            input,
+            call.head,
+            engine_state.get_cancel_flag(),
+        )
     }
 
     fn examples(&self) -> Vec<Example> {

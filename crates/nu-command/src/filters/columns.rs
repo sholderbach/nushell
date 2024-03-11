@@ -83,7 +83,7 @@ fn getcol(
     head: Span,
     input: PipelineData,
 ) -> Result<PipelineData, ShellError> {
-    let ctrlc = engine_state.ctrlc.clone();
+    let ctrlc = engine_state.get_cancel_flag();
     let metadata = input.metadata();
     match input {
         PipelineData::Empty => Ok(PipelineData::Empty),

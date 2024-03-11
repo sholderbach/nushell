@@ -148,7 +148,7 @@ impl Command for Watch {
             None => RecursiveMode::Recursive,
         };
 
-        let ctrlc_ref = &engine_state.ctrlc.clone();
+        let ctrlc_ref = &engine_state.get_cancel_flag();
         let (tx, rx) = channel();
 
         let mut debouncer = match new_debouncer(debounce_duration, None, tx) {
@@ -289,7 +289,7 @@ impl Command for Watch {
                 }
                 Err(RecvTimeoutError::Timeout) => {}
             }
-            if nu_utils::ctrl_c::was_pressed(ctrlc_ref) {
+            if nu_protocol::was_optional_cancel_hit(ctrlc_ref) {
                 break;
             }
         }

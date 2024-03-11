@@ -179,7 +179,7 @@ fn string_helper(
             let output = stream.into_string()?;
             Ok(Value::string(output.item, head).into_pipeline_data())
         }
-        _ => operate(action, args, input, head, engine_state.ctrlc.clone()),
+        _ => operate(action, args, input, head, engine_state.get_cancel_flag()),
     }
 }
 

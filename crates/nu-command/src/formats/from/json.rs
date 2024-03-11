@@ -91,7 +91,7 @@ impl Command for FromJson {
             };
 
             Ok(converted_lines
-                .into_pipeline_data_with_metadata(metadata, engine_state.ctrlc.clone()))
+                .into_pipeline_data_with_metadata(metadata, engine_state.get_cancel_flag()))
         } else if strict {
             Ok(convert_string_to_value_strict(&string_input, span)?
                 .into_pipeline_data_with_metadata(metadata))

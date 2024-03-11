@@ -135,7 +135,7 @@ pub fn run_seq(
                     last: last as i64,
                     span,
                 },
-                engine_state.ctrlc.clone(),
+                engine_state.get_cancel_flag(),
             ),
             None,
         ))
@@ -150,7 +150,7 @@ pub fn run_seq(
                     index: 0,
                     span,
                 },
-                engine_state.ctrlc.clone(),
+                engine_state.get_cancel_flag(),
             ),
             None,
         ))
