@@ -36,11 +36,21 @@ impl CancelFlag {
     /// Should be replaced with a working version with [`CancelFlag::init`]
     ///
     /// This type actively discourages any `Default` implementation
-    pub(super) fn placeholder() -> Self {
-        CancelFlag { ctrlc: Arc::new(AtomicBool::new(false)) }
+    pub fn placeholder() -> Self {
+        CancelFlag {
+            ctrlc: Arc::new(AtomicBool::new(false)),
+        }
     }
 
     pub fn into_raw(self) -> Arc<AtomicBool> {
         self.ctrlc
+    }
+}
+
+pub fn was_optional_cancel_hit(ctrlc: &Option<CancelFlag>) -> bool {
+    if let Some(cf) = ctrlc {
+        cf.is_interrupting()
+    } else {
+        false
     }
 }

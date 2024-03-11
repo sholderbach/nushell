@@ -110,7 +110,8 @@ pub struct EngineState {
     pub(super) modules: Vec<Module>,
     usage: Usage,
     pub scope: ScopeFrame,
-    pub ctrlc: Option<Arc<AtomicBool>>,
+    ctrlc: Option<Arc<AtomicBool>>,
+    cancel_flag: CancelFlag,
     pub env_vars: EnvVars,
     pub previous_env_vars: HashMap<String, Value>,
     pub config: Config,
@@ -166,6 +167,7 @@ impl EngineState {
                 false,
             ),
             ctrlc: None,
+            cancel_flag: CancelFlag::placeholder(),
             env_vars: [(DEFAULT_OVERLAY_NAME.to_string(), HashMap::new())]
                 .into_iter()
                 .collect(),
@@ -209,7 +211,9 @@ impl EngineState {
             "Don't pass a flag that has not been shared and set up with the signal handler"
         );
         // Old
-        self.ctrlc = Some(ctrl_c);
+        self.ctrlc = Some(ctrl_c.clone());
+
+        self.cancel_flag = CancelFlag::init(ctrl_c);
     }
 
     /// Merges a `StateDelta` onto the current state. These deltas come from a system, like the parser, that
@@ -1063,7 +1067,7 @@ impl EngineState {
     /// Get a [`CancelFlag`] that can be cloned and passed when not having access to
     /// [`EngineState::is_cancelled`]
     pub fn get_cancel_flag(&self) -> CancelFlag {
-        todo!()
+        self.cancel_flag.clone()
     }
 
     /// Check if the engines execution has been stopped by a signal (e.g. `CtrlC`)
@@ -1072,7 +1076,7 @@ impl EngineState {
     /// [`EngineState::get_cancel_flag()`] to obtain a [`CancelFlag`] that can be observed for
     /// the same property
     pub fn is_cancelled(&self) -> bool {
-        todo!()
+        self.cancel_flag.is_interrupting()
     }
 }
 
