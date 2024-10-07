@@ -151,10 +151,8 @@ impl Stack {
 
     /// Lookup a variable, returning None if it is not present
     fn lookup_var(&self, var_id: VarId) -> Option<Value> {
-        for (id, val) in &self.vars {
-            if var_id == *id {
-                return Some(val.clone());
-            }
+        if let Some(val) = self.vars.get(&var_id) {
+            return Some(val.clone());
         }
 
         if let Some(stack) = &self.parent_stack {
