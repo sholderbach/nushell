@@ -6,7 +6,7 @@ use crate::{
     Config, OutDest, ShellError, Span, Value, VarId, ENV_VARIABLE_ID, NU_VARIABLE_ID,
 };
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashMap, HashSet},
     fs::File,
     sync::Arc,
 };
@@ -34,7 +34,7 @@ pub type EnvVars = HashMap<String, HashMap<String, Value>>;
 #[derive(Debug, Clone)]
 pub struct Stack {
     /// Variables
-    pub vars: HashMap<VarId, Value>,
+    pub vars: BTreeMap<VarId, Value>,
     /// Environment variables arranged as a stack to be able to recover values from parent scopes
     pub env_vars: Vec<Arc<EnvVars>>,
     /// Tells which environment variables from engine state are hidden, per overlay.
@@ -314,7 +314,7 @@ impl Stack {
     }
 
     pub fn gather_captures(&self, engine_state: &EngineState, captures: &[VarId]) -> Stack {
-        let mut vars = HashMap::with_capacity(captures.len());
+        let mut vars = BTreeMap::new();
 
         let fake_span = Span::new(0, 0);
 
