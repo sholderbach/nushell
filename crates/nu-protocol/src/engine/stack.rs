@@ -34,7 +34,7 @@ pub type EnvVars = HashMap<String, HashMap<String, Value>>;
 #[derive(Debug, Clone)]
 pub struct Stack {
     /// Variables
-    pub vars: Vec<(VarId, Value)>,
+    pub vars: HashMap<VarId, Value>,
     /// Environment variables arranged as a stack to be able to recover values from parent scopes
     pub env_vars: Vec<Arc<EnvVars>>,
     /// Tells which environment variables from engine state are hidden, per overlay.
@@ -72,7 +72,7 @@ impl Stack {
     /// (as opposed to a [`PipelineData`](crate::PipelineData)).
     pub fn new() -> Self {
         Self {
-            vars: Vec::new(),
+            vars: Default::default(),
             env_vars: Vec::new(),
             env_hidden: Arc::new(HashMap::new()),
             active_overlays: vec![DEFAULT_OVERLAY_NAME.to_string()],
@@ -101,7 +101,7 @@ impl Stack {
             error_handlers: ErrorHandlerStack::new(),
             use_ir: parent.use_ir,
             recursion_count: parent.recursion_count,
-            vars: vec![],
+            vars: Default::default(),
             parent_deletions: vec![],
             config: parent.config.clone(),
             out_dest: parent.out_dest.clone(),
@@ -123,7 +123,7 @@ impl Stack {
 
         unique_stack
             .vars
-            .retain(|(var, _)| !child.parent_deletions.contains(var));
+            .retain(|var, _| !child.parent_deletions.contains(var));
         for (var, value) in child.vars {
             unique_stack.add_var(var, value);
         }
@@ -228,23 +228,11 @@ impl Stack {
     }
 
     pub fn add_var(&mut self, var_id: VarId, value: Value) {
-        //self.vars.insert(var_id, value);
-        for (id, val) in &mut self.vars {
-            if *id == var_id {
-                *val = value;
-                return;
-            }
-        }
-        self.vars.push((var_id, value));
+        self.vars.insert(var_id, value);
     }
 
     pub fn remove_var(&mut self, var_id: VarId) {
-        for (idx, (id, _)) in self.vars.iter().enumerate() {
-            if *id == var_id {
-                self.vars.remove(idx);
-                break;
-            }
-        }
+        self.vars.remove(&var_id);
         // even if we did have it in the original layer, we need to make sure to remove it here
         // as well (since the previous update might have simply hid the parent value)
         if self.parent_stack.is_some() {
@@ -310,7 +298,7 @@ impl Stack {
         env_vars.push(Arc::new(HashMap::new()));
 
         Stack {
-            vars: captures,
+            vars: captures.into_iter().collect(),
             env_vars,
             env_hidden: self.env_hidden.clone(),
             active_overlays: self.active_overlays.clone(),
@@ -326,7 +314,7 @@ impl Stack {
     }
 
     pub fn gather_captures(&self, engine_state: &EngineState, captures: &[VarId]) -> Stack {
-        let mut vars = Vec::with_capacity(captures.len());
+        let mut vars = HashMap::with_capacity(captures.len());
 
         let fake_span = Span::new(0, 0);
 
@@ -334,9 +322,9 @@ impl Stack {
             // Note: this assumes we have calculated captures correctly and that commands
             // that take in a var decl will manually set this into scope when running the blocks
             if let Ok(value) = self.get_var(*capture, fake_span) {
-                vars.push((*capture, value));
+                vars.insert(*capture, value);
             } else if let Some(const_val) = &engine_state.get_var(*capture).const_val {
-                vars.push((*capture, const_val.clone()));
+                vars.insert(*capture, const_val.clone());
             }
         }
 
